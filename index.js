@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -41,14 +41,60 @@ async function run() {
 
     app.get("/addedToys/:email", async (req, res) => {
       const filter = {
-        projection: { price: 1, quantity: 1, description: 1, category:1,name:1 },
+        projection: {
+          price: 1,
+          quantity: 1,
+          description: 1,
+          category: 1,
+          name: 1,
+        },
       };
+
       const myToys = await addToyToDB
         .find({ email: req.params.email }, filter)
         .toArray();
 
       res.send(myToys);
     });
+
+
+    app.get("/addedToys", async (req, res) => {
+      const allToys = await addToyToDB.find().limit(20).toArray();
+      res.send(allToys);
+    });
+
+      
+
+    // app.put("/addedToys/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   // console.log(id);
+    //   const filter = { _id: new ObjectId(id) };
+    //   const options= {upsert: true}
+    //   const editToy = req.body;
+    //   const editedToy = {
+    //     $set: {
+    //       price: editToy.price,
+    //       quantity: editToy.quantity,
+    //       description: editToy.description,
+    //     },
+    //   };
+    //   const result = await addToyToDB.updateOne(filter, editedToy, options);
+    //   res.result(result);
+    // });
+
+    // app.put('/addedToys/:id', async (req, res) => {
+    //   const id= req.params.id;
+    //   console.log(id)
+    // })
+
+    app.delete("/addedToys/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await addToyToDB.deleteOne(query);
+      res.send(result);
+      console.log(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
