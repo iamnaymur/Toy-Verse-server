@@ -32,12 +32,23 @@ async function run() {
       res.send(result);
     });
 
-    app.post('/addedToys', async (req, res) => {
-      const added = req.body
+    app.post("/addedToys", async (req, res) => {
+      const added = req.body;
       // console.log(added)
-      const result= await addToyToDB.insertOne(added)
+      const result = await addToyToDB.insertOne(added);
       res.send(result);
-    })
+    });
+
+    app.get("/addedToys/:email", async (req, res) => {
+      const filter = {
+        projection: { price: 1, quantity: 1, description: 1, category:1,name:1 },
+      };
+      const myToys = await addToyToDB
+        .find({ email: req.params.email }, filter)
+        .toArray();
+
+      res.send(myToys);
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
