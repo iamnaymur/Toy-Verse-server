@@ -57,35 +57,35 @@ async function run() {
       res.send(myToys);
     });
 
-
     app.get("/addedToys", async (req, res) => {
       const allToys = await addToyToDB.find().limit(20).toArray();
       res.send(allToys);
     });
 
-      
+    app.get("/addToys/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await addToyToDB.findOne(filter);
+      res.send(result);
+    });
 
-    // app.put("/addedToys/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   // console.log(id);
-    //   const filter = { _id: new ObjectId(id) };
-    //   const options= {upsert: true}
-    //   const editToy = req.body;
-    //   const editedToy = {
-    //     $set: {
-    //       price: editToy.price,
-    //       quantity: editToy.quantity,
-    //       description: editToy.description,
-    //     },
-    //   };
-    //   const result = await addToyToDB.updateOne(filter, editedToy, options);
-    //   res.result(result);
-    // });
+    app.put("/addToys/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedToy = req.body;
+      const NewToyInfo = {
+        $set: {
+          price: updatedToy.price,
 
-    // app.put('/addedToys/:id', async (req, res) => {
-    //   const id= req.params.id;
-    //   console.log(id)
-    // })
+          quantity: updatedToy.quantity,
+
+          description: updatedToy.description,
+        },
+      };
+      const result = await addToyToDB.updateOne(query, NewToyInfo, options);
+      res.send(result);
+    });
 
     app.delete("/addedToys/:id", async (req, res) => {
       const id = req.params.id;
