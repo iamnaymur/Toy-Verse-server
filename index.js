@@ -32,6 +32,19 @@ async function run() {
       res.send(result);
     });
 
+  
+
+    app.get("/toyName/:searchText", async (req, res) => {
+      const searchedText = req.params.searchText;
+      const result = await addToyToDB
+        .find({
+          $or: [{ name: { $regex: searchedText, $options: "i" } }],
+          
+        })
+        .toArray();
+      res.send(result);
+    });
+
     app.post("/addedToys", async (req, res) => {
       const added = req.body;
       // console.log(added)
@@ -61,6 +74,7 @@ async function run() {
       const allToys = await addToyToDB.find().limit(20).toArray();
       res.send(allToys);
     });
+    
 
     app.get("/addToys/:id", async (req, res) => {
       const id = req.params.id;
