@@ -22,24 +22,15 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    client.connect();
 
-    const collectionToyDB = client.db("toyVerseDB").collection("categoriesToy");
     const addToyToDB = client.db("toyVerseDB").collection("addToy");
-
-    app.get("/toyCategories", async (req, res) => {
-      const result = await collectionToyDB.find().toArray();
-      res.send(result);
-    });
-
-  
 
     app.get("/toyName/:searchText", async (req, res) => {
       const searchedText = req.params.searchText;
       const result = await addToyToDB
         .find({
           $or: [{ name: { $regex: searchedText, $options: "i" } }],
-          
         })
         .toArray();
       res.send(result);
@@ -53,18 +44,9 @@ async function run() {
     });
 
     app.get("/addedToys/:email", async (req, res) => {
-      const filter = {
-        projection: {
-          price: 1,
-          quantity: 1,
-          description: 1,
-          category: 1,
-          name: 1,
-        },
-      };
-
       const myToys = await addToyToDB
-        .find({ email: req.params.email }, filter)
+        .find({ email: req.params.email })
+        .sort({ price: -1 })
         .toArray();
 
       res.send(myToys);
@@ -74,7 +56,6 @@ async function run() {
       const allToys = await addToyToDB.find().limit(20).toArray();
       res.send(allToys);
     });
-    
 
     app.get("/addToys/:id", async (req, res) => {
       const id = req.params.id;
