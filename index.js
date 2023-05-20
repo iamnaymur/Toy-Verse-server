@@ -46,7 +46,7 @@ async function run() {
     app.get("/addedToys/:email", async (req, res) => {
       const myToys = await addToyToDB
         .find({ email: req.params.email })
-        .sort({ price: -1 })
+        .sort({ price: req.query.sort === "true" ? 1 : -1 })
         .toArray();
 
       res.send(myToys);
